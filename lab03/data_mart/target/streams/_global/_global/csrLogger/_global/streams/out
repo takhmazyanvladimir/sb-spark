@@ -1,0 +1,6 @@
+[debug] downloaded https://repo1.maven.org/maven2/com/datastax/spark/spark-cassandra-connector_2.11_2.12/2.5.1/spark-cassandra-connector_2.11_2.12-2.5.1.pom
+[debug] downloaded https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch-spark-20_2.11_2.12/7.15.0/elasticsearch-spark-20_2.11_2.12-7.15.0.pom
+[debug] downloaded https://repo1.maven.org/maven2/org/postgresql/postgresql_2.12/42.1.4/postgresql_2.12-42.1.4.pom
+[debug] downloaded https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch-spark-20_2.11_2.12/7.15.0/elasticsearch-spark-20_2.11_2.12-7.15.0.pom.sha1
+[debug] downloaded https://repo1.maven.org/maven2/com/datastax/spark/spark-cassandra-connector_2.11_2.12/2.5.1/spark-cassandra-connector_2.11_2.12-2.5.1.pom.sha1
+[debug] downloaded https://repo1.maven.org/maven2/org/postgresql/postgresql_2.12/42.1.4/postgresql_2.12-42.1.4.pom.sha1
