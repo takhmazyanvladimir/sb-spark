@@ -3,17 +3,22 @@ package org.example
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
+import org.apache.spark._
 
 object filter extends App {
-  val spark = SparkSession.builder().master("local[*]").getOrCreate()
 
+  val conf = new SparkConf().setAppName("spark-test").setMaster("local[1]")
+  val sc = new SparkContext(conf)
+  val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+  val offset = conf.getOption("spark.filter.offset").getOrElse("earliest")
+  val prefix = conf.getOption("spark.filter.output_dir_prefix").getOrElse("visits")
 
   val df = spark
     .read
     .format("kafka")
     .option("kafka.bootstrap.servers", "spark-master-1:6667")
     .option("subscribe", "lab04_input_data")
-    .option("startingOffsets", "earliest")
+    .option("startingOffsets", offset)
     .option("endingOffsets", "latest")
     .load()
 
@@ -38,7 +43,7 @@ object filter extends App {
     .mode("overwrite")
     .format("json")
     .partitionBy("p_date")
-    .json("lab04/buy/")
+    .json("hdfs:///user/vladimir.takhmazyan/" + prefix + "/buy/")
 
   dfParsed
     .filter(col("event_type") === "view")
@@ -46,6 +51,6 @@ object filter extends App {
     .mode("overwrite")
     .format("json")
     .partitionBy("p_date")
-    .json("lab04/view/")
+    .json("hdfs:///user/vladimir.takhmazyan/" + prefix + "/view/")
 
 }
