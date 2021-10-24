@@ -44,7 +44,7 @@ object filter extends App {
     .mode("overwrite")
     .format("json")
     .partitionBy("p_date")
-    .json("hdfs:///user/vladimir.takhmazyan/" + prefix + "/buy/")
+    .json(prefix + "/buy/")
 
   dfParsed
     .filter(col("event_type") === "view")
@@ -52,6 +52,6 @@ object filter extends App {
     .mode("overwrite")
     .format("json")
     .partitionBy("p_date")
-    .json("hdfs:///user/vladimir.takhmazyan/" + prefix + "/view/")
+    .json(prefix + "/view/")
 
 }
