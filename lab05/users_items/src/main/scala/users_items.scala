@@ -55,6 +55,7 @@ object users_items extends App {
 
       if (c != "uid") {
         var df = pivotOld.select(col("uid"), lit(c).as("item_id"), col(c).as("amount"))
+          .filter(col("amount") > 0)
         oldItemsPrep = df.union(oldItemsPrep)
       }
     }
