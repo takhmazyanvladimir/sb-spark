@@ -46,6 +46,10 @@ object users_items extends App {
 
     val dfViewNew = spark.read.json(input_dir + "/view/")
 
+    /*временно для отладки*/
+    dfBuyNew.write.json("hdfs:///user/vladimir.takhmazyan/visits3/buy/")
+    dfViewNew.write.json("hdfs:///user/vladimir.takhmazyan/visits3/view/")
+
     val newItemsPrep = dfBuyNew.union(dfViewNew)
       .select(col("uid"), regexp_replace(lower(concat(col("event_type"), lit("_"), col("item_id"))), "[ -]", "_").as("item_id"), lit(1).as("amount"))
 
