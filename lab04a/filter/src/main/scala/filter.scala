@@ -19,7 +19,7 @@ object filter extends App {
     .read
     .format("kafka")
     .option("kafka.bootstrap.servers", "spark-master-1:6667")
-    .option("subscribe", "lab04_input_data")
+    .option("subscribe", topicName)
     .option("startingOffsets", offset)
     .option("endingOffsets", "latest")
     .load()
