@@ -8,9 +8,10 @@ object filter extends App {
   val conf = new SparkConf().setAppName("spark-test").setMaster("local[1]")
   val sc = new SparkContext(conf)
   val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+  val topicName = conf.getOption("spark.filter.topic_name").getOrElse("lab04_input_data")
   val offsetStr = conf.getOption("spark.filter.offset").getOrElse("earliest")
   val offset = { if (offsetStr == "earliest") offsetStr
-  else """{"lab04_input_data":{"0":""" + offsetStr + """}}"""}
+  else "{" + topicName + """:{"0":""" + offsetStr + """}}"""}
   val prefix = conf.getOption("spark.filter.output_dir_prefix").getOrElse("visits")
 
 
