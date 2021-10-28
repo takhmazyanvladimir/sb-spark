@@ -1,12 +1,10 @@
 name := "data_mart"
 
-version := "0.1"
+version := "1.0"
 
-scalaVersion := "2.12.15"
+scalaVersion := "2.11.12"
 
-idePackagePrefix := Some("org.example")
-
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.1.2"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.4.8"
 
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 
