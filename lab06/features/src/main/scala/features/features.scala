@@ -5,20 +5,20 @@ import org.apache.spark.sql.types._
 object features extends App {
   val spark = SparkSession.builder().master("local[*]").getOrCreate()
 
-
+  spark.conf.set("spark.sql.session.timeZone", "UTC")
   val weblogs = spark.read.json("/labs/laba03/weblogs.json")
-    .select(col("uid"),explode(col("visits")).as("visit"))
-    .select(col("uid"),col("visit.timestamp"),col("visit.url"))
+    .select(col("uid"), explode(col("visits")).as("visit"))
+    .select(col("uid"), col("visit.timestamp"), col("visit.url"))
     .withColumn("host", lower(callUDF("parse_url", col("url"), lit("HOST"))))
     .withColumn("domain", regexp_replace(col("host"), "www.", ""))
-    .withColumn("dayOfWeek",dayofweek(from_unixtime(col("timestamp")/1000)))
-    .withColumn("hour",hour(from_unixtime(col("timestamp")/1000)))
-    .withColumn("work_hour",when(col("hour") >= 9 && col("hour") < 18, 1).otherwise(0))
-    .withColumn("evening_hour",when(col("hour") >= 18, 1).otherwise(0))
+    .withColumn("dayOfWeek", dayofweek(from_unixtime(col("timestamp") / 1000)))
+    .withColumn("hour", hour(from_unixtime(col("timestamp") / 1000)))
+    .withColumn("work_hour", when(col("hour") >= 9 && col("hour") < 18, 1).otherwise(0))
+    .withColumn("evening_hour", when(col("hour") >= 18, 1).otherwise(0))
 
   val hourMetrics = weblogs
     .filter(col("uid").isNotNull)
-    .withColumn("hourFeat",concat(lit("web_hour_"),col("hour").cast(StringType)))
+    .withColumn("hourFeat", concat(lit("web_hour_"), col("hour").cast(StringType)))
     .groupBy(col("uid")).pivot("hourFeat").count()
 
   print(hourMetrics.count())
@@ -35,8 +35,8 @@ object features extends App {
       sum(when(col("dayOfWeek") === 6, 1).otherwise(0)).as("web_day_fri"),
       sum(when(col("dayOfWeek") === 7, 1).otherwise(0)).as("web_day_sat"),
       sum(when(col("dayOfWeek") === 1, 1).otherwise(0)).as("web_day_sun"),
-      (sum(col("work_hour"))/count("*")).as("web_fraction_work_hours"),
-      (sum(col("evening_hour"))/count("*")).as("web_fraction_evening_hours")
+      (sum(col("work_hour")) / count("*")).as("web_fraction_work_hours"),
+      (sum(col("evening_hour")) / count("*")).as("web_fraction_evening_hours")
     )
 
   print(otherMetrics.count())
@@ -56,8 +56,8 @@ object features extends App {
 
   val usersDomains = weblogs
     .filter(col("uid").isNotNull)
-    .join(popularDomains,Seq("domain"),"inner")
-    .groupBy(col("uid"),col("domain"))
+    .join(popularDomains, Seq("domain"), "inner")
+    .groupBy(col("uid"), col("domain"))
     .agg(count("*").as("cn"))
 
   val users = weblogs
@@ -70,9 +70,9 @@ object features extends App {
 
   val usersDomainsAgg = users
     .crossJoin(popularDomains)
-    .join(usersDomains,Seq("uid","domain"),"left")
+    .join(usersDomains, Seq("uid", "domain"), "left")
     .na.fill(0)
-    .orderBy(asc("uid"),asc("domain"))
+    .orderBy(asc("uid"), asc("domain"))
     .groupBy(col("uid"))
     .agg(collect_list(col("cn")).as("domain_features"))
 
@@ -80,13 +80,13 @@ object features extends App {
   usersDomainsAgg.persist()
 
   val allNewMetrics = usersDomainsAgg
-    .join(hourMetrics,Seq("uid"),"inner")
-    .join(otherMetrics,Seq("uid"),"inner")
+    .join(hourMetrics, Seq("uid"), "inner")
+    .join(otherMetrics, Seq("uid"), "inner")
 
   val usersItems = spark.read.parquet("hdfs:///user/vladimir.takhmazyan/users-items/20200429/")
 
   usersItems
-    .join(allNewMetrics,Seq("uid"),"full")
+    .join(allNewMetrics, Seq("uid"), "full")
     .write.parquet("hdfs:///user/vladimir.takhmazyan/features/")
 
 
