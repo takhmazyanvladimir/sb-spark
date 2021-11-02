@@ -80,4 +80,6 @@ object agg extends App {
 
   createKafkaSink("state2", "update", dfAggJson).start
 
+  createConsoleSink("state2", "update", dfAggJson).start
+
 }
